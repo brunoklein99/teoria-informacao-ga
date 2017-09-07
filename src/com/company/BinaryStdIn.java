@@ -14,6 +14,7 @@ package com.company;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.NoSuchElementException;
 
 /**
@@ -36,19 +37,16 @@ import java.util.NoSuchElementException;
  *  @author Kevin Wayne
  */
 public final class BinaryStdIn {
-    private static BufferedInputStream in = new BufferedInputStream(System.in);
+    private static InputStream in;
     private static final int EOF = -1;    // end of file
 
     private static int buffer;            // one character buffer
     private static int n;                 // number of bits left in buffer
 
-    // static initializer
-    static {
+    public BinaryStdIn(InputStream in) {
+        this.in = in;
         fillBuffer();
     }
-
-    // don't instantiate
-    private BinaryStdIn() { }
 
     private static void fillBuffer() {
         try {

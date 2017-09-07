@@ -23,6 +23,9 @@ package com.company;
  *
  ******************************************************************************/
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  *  The {@code Huffman} class provides static methods for compressing
  *  and expanding a binary input using Huffman codes over the 8-bit extended
@@ -73,9 +76,11 @@ public class Huffman {
      * using Huffman codes with an 8-bit alphabet; and writes the results
      * to standard output.
      */
-    public static void compress() {
+    public static void compress(InputStream in, OutputStream out) {
         // read the input
-        String s = BinaryStdIn.readString();
+        BinaryStdIn binIn = new BinaryStdIn(in);
+
+        String s = binIn.readString();
         char[] input = s.toCharArray();
 
         // tabulate frequency counts
@@ -90,28 +95,30 @@ public class Huffman {
         String[] st = new String[R];
         buildCode(st, root, "");
 
+        BinaryStdOut binOut = new BinaryStdOut(out);
+
         // print trie for decoder
-        writeTrie(root);
+        writeTrie(binOut, root);
 
         // print number of bytes in original uncompressed message
-        BinaryStdOut.write(input.length);
+        binOut.write(input.length);
 
         // use Huffman code to encode input
         for (int i = 0; i < input.length; i++) {
             String code = st[input[i]];
             for (int j = 0; j < code.length(); j++) {
                 if (code.charAt(j) == '0') {
-                    BinaryStdOut.write(false);
+                    binOut.write(false);
                 }
                 else if (code.charAt(j) == '1') {
-                    BinaryStdOut.write(true);
+                    binOut.write(true);
                 }
                 else throw new IllegalStateException("Illegal state");
             }
         }
 
         // close output stream
-        BinaryStdOut.close();
+        binOut.close();
     }
 
     // build the Huffman trie given frequencies
@@ -141,15 +148,15 @@ public class Huffman {
 
 
     // write bitstring-encoded trie to standard output
-    private static void writeTrie(Node x) {
+    private static void writeTrie(BinaryStdOut out, Node x) {
         if (x.isLeaf()) {
-            BinaryStdOut.write(true);
-            BinaryStdOut.write(x.ch, 8);
+            out.write(true);
+            out.write(x.ch, 8);
             return;
         }
         BinaryStdOut.write(false);
-        writeTrie(x.left);
-        writeTrie(x.right);
+        writeTrie(out, x.left);
+        writeTrie(out, x.right);
     }
 
     // make a lookup table from symbols and their encodings
@@ -167,35 +174,38 @@ public class Huffman {
      * Reads a sequence of bits that represents a Huffman-compressed message from
      * standard input; expands them; and writes the results to standard output.
      */
-    public static void expand() {
+    public static void expand(InputStream in, OutputStream out) {
+
+        BinaryStdIn stdIn = new BinaryStdIn(in);
+        BinaryStdOut stdOut = new BinaryStdOut(out);
 
         // read in Huffman trie from input stream
-        Node root = readTrie();
+        Node root = readTrie(stdIn);
 
         // number of bytes to write
-        int length = BinaryStdIn.readInt();
+        int length = stdIn.readInt();
 
         // decode using the Huffman trie
         for (int i = 0; i < length; i++) {
             Node x = root;
             while (!x.isLeaf()) {
-                boolean bit = BinaryStdIn.readBoolean();
+                boolean bit = stdIn.readBoolean();
                 if (bit) x = x.right;
                 else     x = x.left;
             }
-            BinaryStdOut.write(x.ch, 8);
+            stdOut.write(x.ch, 8);
         }
-        BinaryStdOut.close();
+        stdOut.close();
     }
 
 
-    private static Node readTrie() {
-        boolean isLeaf = BinaryStdIn.readBoolean();
+    private static Node readTrie(BinaryStdIn in) {
+        boolean isLeaf = in.readBoolean();
         if (isLeaf) {
-            return new Node(BinaryStdIn.readChar(), -1, null, null);
+            return new Node(in.readChar(), -1, null, null);
         }
         else {
-            return new Node('\0', -1, readTrie(), readTrie());
+            return new Node('\0', -1, readTrie(in), readTrie(in));
         }
     }
 
@@ -205,10 +215,10 @@ public class Huffman {
      *
      * @param args the command-line arguments
      */
-    public static void main(String[] args) {
-        if      (args[0].equals("-")) compress();
-        else if (args[0].equals("+")) expand();
-        else throw new IllegalArgumentException("Illegal command line argument");
-    }
+//    public static void main(String[] args) {
+//        if      (args[0].equals("-")) compress();
+//        else if (args[0].equals("+")) expand();
+//        else throw new IllegalArgumentException("Illegal command line argument");
+//    }
 
 }

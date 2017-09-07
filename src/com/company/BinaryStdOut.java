@@ -15,6 +15,7 @@ package com.company;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  *  <i>Binary standard output</i>. This class provides methods for converting
@@ -33,13 +34,14 @@ import java.io.IOException;
  *  @author Kevin Wayne
  */
 public final class BinaryStdOut {
-    private static BufferedOutputStream out = new BufferedOutputStream(System.out);
+    private static OutputStream out;
 
     private static int buffer;     // 8-bit buffer of bits to write out
     private static int n;          // number of bits remaining in buffer
 
-    // don't instantiate
-    private BinaryStdOut() { }
+    public BinaryStdOut(OutputStream out) {
+        this.out = out;
+    }
 
     /**
      * Write the specified bit to standard output.
