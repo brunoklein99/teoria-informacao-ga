@@ -2,3 +2,7 @@
 \.idea/
 
 *.iml
+
+out/
+
+src/com/company/alice29\.txt
