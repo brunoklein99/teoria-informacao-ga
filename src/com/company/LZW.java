@@ -1,5 +1,8 @@
 package com.company;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * Created by klein-desk on 17-Sep-17.
  */
@@ -16,8 +19,12 @@ public class LZW {
      * them using LZW compression with 12-bit codewords; and writes the results
      * to standard output.
      */
-    public static void compress() {
-        String input = BinaryStdIn.readString();
+    public static void compress(InputStream in, OutputStream out) {
+
+        BinaryStdIn binIn = new BinaryStdIn(in);
+        BinaryStdOut binOut = new BinaryStdOut(out);
+
+        String input = binIn.readString();
         TST<Integer> st = new TST<Integer>();
         for (int i = 0; i < R; i++)
             st.put("" + (char) i, i);
@@ -25,14 +32,14 @@ public class LZW {
 
         while (input.length() > 0) {
             String s = st.longestPrefixOf(input);  // Find max prefix match s.
-            BinaryStdOut.write(st.get(s), W);      // Print s's encoding.
+            binOut.write(st.get(s), W);      // Print s's encoding.
             int t = s.length();
             if (t < input.length() && code < L)    // Add s to symbol table.
                 st.put(input.substring(0, t + 1), code++);
             input = input.substring(t);            // Scan past s in input.
         }
-        BinaryStdOut.write(R, W);
-        BinaryStdOut.close();
+        binOut.write(R, W);
+        binOut.close();
     }
 
     /**
@@ -40,7 +47,11 @@ public class LZW {
      * 12-bit codewords from standard input; expands them; and writes
      * the results to standard output.
      */
-    public static void expand() {
+    public static void expand(InputStream in, OutputStream out) {
+
+        BinaryStdIn binIn = new BinaryStdIn(in);
+        BinaryStdOut binOut = new BinaryStdOut(out);
+
         String[] st = new String[L];
         int i; // next available codeword value
 
@@ -49,20 +60,20 @@ public class LZW {
             st[i] = "" + (char) i;
         st[i++] = "";                        // (unused) lookahead for EOF
 
-        int codeword = BinaryStdIn.readInt(W);
+        int codeword = binIn.readInt(W);
         if (codeword == R) return;           // expanded message is empty string
         String val = st[codeword];
 
         while (true) {
-            BinaryStdOut.write(val);
-            codeword = BinaryStdIn.readInt(W);
+            binOut.write(val);
+            codeword = binIn.readInt(W);
             if (codeword == R) break;
             String s = st[codeword];
             if (i == codeword) s = val + val.charAt(0);   // special case hack
             if (i < L) st[i++] = val + s.charAt(0);
             val = s;
         }
-        BinaryStdOut.close();
+        binOut.close();
     }
 
     /**
@@ -71,11 +82,13 @@ public class LZW {
      *
      * @param args the command-line arguments
      */
+    /*
     public static void main(String[] args) {
         if      (args[0].equals("-")) compress();
         else if (args[0].equals("+")) expand();
         else throw new IllegalArgumentException("Illegal command line argument");
     }
+    */
 
 }
 
