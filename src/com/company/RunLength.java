@@ -24,6 +24,9 @@ package com.company;
  *
  ******************************************************************************/
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  *  The {@code RunLength} class provides static methods for compressing
  *  and expanding a binary input using run-length coding with 8-bit
@@ -49,15 +52,19 @@ public class RunLength {
      * using run-length encoding with 8-bit run lengths); decodes them;
      * and writes the results to standard output.
      */
-    public static void expand() {
+    public static void expand(InputStream in, OutputStream out) {
+
+        BinaryStdIn stdIn = new BinaryStdIn(in);
+        BinaryStdOut stdOut = new BinaryStdOut(out);
+
         boolean b = false;
-        while (!BinaryStdIn.isEmpty()) {
-            int run = BinaryStdIn.readInt(LG_R);
+        while (!stdIn.isEmpty()) {
+            int run = stdIn.readInt(LG_R);
             for (int i = 0; i < run; i++)
-                BinaryStdOut.write(b);
+                stdOut.write(b);
             b = !b;
         }
-        BinaryStdOut.close();
+        stdOut.close();
     }
 
     /**
@@ -65,26 +72,30 @@ public class RunLength {
      * them using run-length coding with 8-bit run lengths; and writes the
      * results to standard output.
      */
-    public static void compress() {
+    public static void compress(InputStream in, OutputStream out) {
+
+        BinaryStdIn stdIn = new BinaryStdIn(in);
+        BinaryStdOut stdOut = new BinaryStdOut(out);
+
         char run = 0;
         boolean old = false;
-        while (!BinaryStdIn.isEmpty()) {
-            boolean b = BinaryStdIn.readBoolean();
+        while (!stdIn.isEmpty()) {
+            boolean b = stdIn.readBoolean();
             if (b != old) {
-                BinaryStdOut.write(run, LG_R);
+                stdOut.write(run, LG_R);
                 run = 1;
                 old = !old;
             } else {
                 if (run == R - 1) {
-                    BinaryStdOut.write(run, LG_R);
+                    stdOut.write(run, LG_R);
                     run = 0;
-                    BinaryStdOut.write(run, LG_R);
+                    stdOut.write(run, LG_R);
                 }
                 run++;
             }
         }
-        BinaryStdOut.write(run, LG_R);
-        BinaryStdOut.close();
+        stdOut.write(run, LG_R);
+        stdOut.close();
     }
 
 

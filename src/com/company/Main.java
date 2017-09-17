@@ -1,39 +1,62 @@
 package com.company;
 
 import java.io.*;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        String inputFileHuffman = "C:\\Users\\klein-desk\\IdeaProjects\\informacaoga\\src\\com\\company\\alice29.txt";
-        String outputFileHuffman = "C:\\Users\\klein-desk\\IdeaProjects\\informacaoga\\src\\com\\company\\alice29.huffman";
-        String outputDeflate = "C:\\Users\\klein-desk\\IdeaProjects\\informacaoga\\src\\com\\company\\alice29.huffman.deflate";
+        String inLzwFilenameCompress = "G:\\alice29.txt";
+        String outLzwFilenameCompress = "G:\\alice29.lzw";
+        String inHuffmanFilenameCompress = outLzwFilenameCompress;
+        String outHuffmanFilenameCompress = "G:\\alice29.lzw.huffman";
 
-        InputStream inHuffman = new BufferedInputStream(new FileInputStream(inputFileHuffman));
-        OutputStream outHuffman = new BufferedOutputStream(new FileOutputStream(outputFileHuffman));
+        String inHuffmanFilenameDecompress = outHuffmanFilenameCompress;
+        String outHuffmanFilenameDecompress = "G:\\alice29.decompress.lzw";
+        String inLzwFilenameDecompress = outHuffmanFilenameDecompress;
+        String outLzwFilenameDecompress = "G:\\alice29.decompress.txt";
 
-        Huffman.compress(inHuffman, outHuffman);
+        lzwCompress(inLzwFilenameCompress, outLzwFilenameCompress);
+        huffmanCompress(inHuffmanFilenameCompress, outHuffmanFilenameCompress);
 
-        InputStream inDeflate = new BufferedInputStream(new FileInputStream(outputFileHuffman));
-        OutputStream outDeflate = new BufferedOutputStream(new FileOutputStream(outputDeflate));
-        outDeflate = new DeflaterOutputStream(outDeflate);
-        copy(inDeflate, outDeflate);
+        huffmanDecompress(inHuffmanFilenameDecompress, outHuffmanFilenameDecompress);
+        lzwDecompress(inLzwFilenameDecompress, outLzwFilenameDecompress);
 
         System.out.println("fim");
     }
 
-    public static void copy(InputStream is, OutputStream os) throws Exception {
-        byte[] bytes = new byte[1024];
-        int length;
-        try {
-            while ((length = is.read(bytes)) >= 0) {
-                os.write(bytes, 0, length);
-            }
-        } finally {
-            os.close();
-            is.close();
-        }
+    private static void lzwCompress(String inFilename, String outFilename) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
+        LZW.compress(in, out);
+    }
+
+    private static void lzwDecompress(String inFilename, String outFilename) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
+        LZW.expand(in, out);
+    }
+
+    private static void huffmanCompress(String inFilename, String outFilename) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
+        Huffman.compress(in, out);
+    }
+
+    private static void huffmanDecompress(String inFilename, String outFilename) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
+        Huffman.expand(in, out);
+    }
+
+    private static void runLengthCompress(String inFilename, String outFilename) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
+        RunLength.compress(in, out);
+    }
+
+    private static void runLengthDecompress(String inFilename, String outFilename) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
+        RunLength.expand(in, out);
     }
 }
