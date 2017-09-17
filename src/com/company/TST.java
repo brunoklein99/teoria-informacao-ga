@@ -5,7 +5,7 @@ package com.company;
  */
 public class TST<Value> {
     private int N;              // size
-    private Node root;   // root of TST
+    private Node<Value> root;   // root of TST
 
     private static class Node<Value> {
         private char c;                        // character
@@ -48,13 +48,13 @@ public class TST<Value> {
     public Value get(String key) {
         if (key == null) throw new NullPointerException();
         if (key.length() == 0) throw new IllegalArgumentException("key must have length >= 1");
-        Node x = get(root, key, 0);
+        Node<Value> x = get(root, key, 0);
         if (x == null) return null;
         return x.val;
     }
 
     // return subtrie corresponding to given key
-    private Node x, String key, int d) {
+    private Node<Value> get(Node x, String key, int d) {
         if (key == null) throw new NullPointerException();
         if (key.length() == 0) throw new IllegalArgumentException("key must have length >= 1");
         if (x == null) return null;
@@ -78,7 +78,7 @@ public class TST<Value> {
         root = put(root, key, val, 0);
     }
 
-    private Node x, String key, Value val, int d) {
+    private Node<Value> put(Node<Value> x, String key, Value val, int d) {
         char c = key.charAt(d);
         if (x == null) {
             x = new Node<Value>();
@@ -145,7 +145,7 @@ public class TST<Value> {
     }
 
     // all keys in subtrie rooted at x with given prefix
-    private void collect(Node queue) {
+    private void collect(Node<Value> x, StringBuilder prefix, Queue<String> queue) {
         if (x == null) return;
         collect(x.left,  prefix, queue);
         if (x.val != null) queue.enqueue(prefix.toString() + x.c);
@@ -168,7 +168,7 @@ public class TST<Value> {
         return queue;
     }
 
-    private void collect(Node queue) {
+    private void collect(Node<Value> x, StringBuilder prefix, int i, String pattern, Queue<String> queue) {
         if (x == null) return;
         char c = pattern.charAt(i);
         if (c == '.' || c < x.c) collect(x.left, prefix, i, pattern, queue);
@@ -187,7 +187,7 @@ public class TST<Value> {
      * Unit tests the TST data type.
      */
     public static void main(String[] args) {
-
+        /*
         // build symbol table from standard input
         TST st = new TST<Integer>();
         for (int i = 0; !StdIn.isEmpty(); i++) {
@@ -216,5 +216,7 @@ public class TST<Value> {
         StdOut.println("keysThatMatch(\".he.l.\"):");
         for (String s : st.keysThatMatch(".he.l."))
             StdOut.println(s);
+         */
     }
 }
+
