@@ -24,8 +24,7 @@ package com.company;
  *
  ******************************************************************************/
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  *  The {@code RunLength} class provides static methods for compressing
@@ -52,19 +51,16 @@ public class RunLength {
      * using run-length encoding with 8-bit run lengths); decodes them;
      * and writes the results to standard output.
      */
-    public static void expand(InputStream in, OutputStream out) {
+    public static void expand(InputStream in, OutputStream out) throws IOException {
 
-        BinaryStdIn stdIn = new BinaryStdIn(in);
-        BinaryStdOut stdOut = new BinaryStdOut(out);
-
-        boolean b = false;
-        while (!stdIn.isEmpty()) {
-            int run = stdIn.readInt(LG_R);
-            for (int i = 0; i < run; i++)
-                stdOut.write(b);
-            b = !b;
+        while (in.available() > 0) {
+            int count = in.read();
+            int value = in.read();
+            for (int i = 0; i < count; i++) {
+                out.write(value);
+            }
         }
-        stdOut.close();
+
     }
 
     /**
@@ -72,30 +68,31 @@ public class RunLength {
      * them using run-length coding with 8-bit run lengths; and writes the
      * results to standard output.
      */
-    public static void compress(InputStream in, OutputStream out) {
+    public static void compress(InputStream in, OutputStream out) throws IOException {
 
-        BinaryStdIn stdIn = new BinaryStdIn(in);
-        BinaryStdOut stdOut = new BinaryStdOut(out);
+        int size = in.available();
+        byte[] buffer = new byte[size];
 
-        char run = 0;
-        boolean old = false;
-        while (!stdIn.isEmpty()) {
-            boolean b = stdIn.readBoolean();
-            if (b != old) {
-                stdOut.write(run, LG_R);
-                run = 1;
-                old = !old;
-            } else {
-                if (run == R - 1) {
-                    stdOut.write(run, LG_R);
-                    run = 0;
-                    stdOut.write(run, LG_R);
+        in.read(buffer, 0, buffer.length);
+
+        for (int i = 0; i < buffer.length; i++) {
+            int runLength = 1;
+            while (i + 1 < buffer.length && buffer[i] == buffer[i + 1]) {
+                runLength++;
+                i++;
+            }
+            if (runLength > 255) {
+                for (int j = 0; j < runLength / 255; j++) {
+                    out.write(255);
+                    out.write(buffer[i]);
                 }
-                run++;
+                out.write(runLength % 255);
+                out.write(buffer[i]);
+            } else {
+                out.write(runLength);
+                out.write(buffer[i]);
             }
         }
-        stdOut.write(run, LG_R);
-        stdOut.close();
     }
 
 
@@ -105,9 +102,15 @@ public class RunLength {
      *
      * @param args the command-line arguments
      */
-//    public static void main(String[] args) {
-//        if (args[0].equals("-")) compress();
-//        else if (args[0].equals("+")) expand();
-//        else throw new IllegalArgumentException("Illegal command line argument");
-//    }
+    public static void main(String[] args) throws IOException {
+        InputStream in = new FileInputStream("G:\\alice29.txt.bwt");
+        OutputStream out = new FileOutputStream("G:\\alice29.txt.bwt.rle");
+
+        compress(in, out);
+
+        in = new FileInputStream("G:\\alice29.txt.bwt.rle");
+        out = new FileOutputStream("G:\\alice29.txt.bwt2");
+
+        expand(in, out);
+    }
 }

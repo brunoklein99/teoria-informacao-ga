@@ -1,5 +1,8 @@
 package com.company;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * Created by klein-desk on 23-Sep-17.
  */
@@ -10,26 +13,34 @@ public class BurrowsWheeler {
     /**
      * apply Burrows-Wheeler encoding, reading from standard input and writing to standard output
      */
-    public static void encode() {
-        String s = BinaryStdIn.readString();
+    public static void encode(InputStream in, OutputStream out) {
+
+        BinaryStdIn stdIn = new BinaryStdIn(in);
+        BinaryStdOut stdOut = new BinaryStdOut(out);
+
+        String s = stdIn.readString();
         CircularSuffixArray csa = new CircularSuffixArray(s);
         int first = 0;
         while (first < csa.length() && csa.index(first) != 0) {
             first++;
         }
-        BinaryStdOut.write(first);
+        stdOut.write(first);
         for (int i = 0; i < csa.length(); i++) {
-            BinaryStdOut.write(s.charAt((csa.index(i) + s.length() - 1) % s.length()));
+            stdOut.write(s.charAt((csa.index(i) + s.length() - 1) % s.length()));
         }
-        BinaryStdOut.close();
+        stdOut.close();
     }
 
     /**
      * apply Burrows-Wheeler decoding, reading from standard input and writing to standard output
      */
-    public static void decode() {
-        int first = BinaryStdIn.readInt();
-        String t = BinaryStdIn.readString();
+    public static void decode(InputStream in, OutputStream out) {
+
+        BinaryStdIn stdIn = new BinaryStdIn(in);
+        BinaryStdOut stdOut = new BinaryStdOut(out);
+
+        int first = stdIn.readInt();
+        String t = stdIn.readString();
         int n = t.length();
         int[] count = new int[R + 1], next = new int[n];
         for (int i = 0; i < n; i++)
@@ -39,8 +50,8 @@ public class BurrowsWheeler {
         for (int i = 0; i < n; i++)
             next[count[t.charAt(i)]++] = i;
         for (int i = next[first], c = 0; c < n; i = next[i], c++)
-            BinaryStdOut.write(t.charAt(i));
-        BinaryStdOut.close();
+            stdOut.write(t.charAt(i));
+        stdOut.close();
     }
 
     /**
@@ -48,6 +59,7 @@ public class BurrowsWheeler {
      *
      * @param args
      */
+    /*
     public static void main(String[] args) {
         if (args.length != 1)
             throw new IllegalArgumentException("Expected + or -\n");
@@ -60,5 +72,6 @@ public class BurrowsWheeler {
             throw new IllegalArgumentException(msg);
         }
     }
+    */
 
 }

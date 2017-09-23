@@ -5,58 +5,47 @@ import java.io.*;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        String inLzwFilenameCompress = "G:\\alice29.txt";
-        String outLzwFilenameCompress = "G:\\alice29.lzw";
-        String inHuffmanFilenameCompress = outLzwFilenameCompress;
-        String outHuffmanFilenameCompress = "G:\\alice29.lzw.huffman";
 
-        String inHuffmanFilenameDecompress = outHuffmanFilenameCompress;
-        String outHuffmanFilenameDecompress = "G:\\alice29.decompress.lzw";
-        String inLzwFilenameDecompress = outHuffmanFilenameDecompress;
-        String outLzwFilenameDecompress = "G:\\alice29.decompress.txt";
+        String oriFilename = "G:\\alice29.txt";
+        String bwtFilename = "G:\\alice29.txt.bwt";
+        String rleFilename = "G:\\alice29.txt.bwt.rle";
+        String hufFilename = "G:\\alice29.txt.bwt.rle.huf";
 
-        lzwCompress(inLzwFilenameCompress, outLzwFilenameCompress);
-        huffmanCompress(inHuffmanFilenameCompress, outHuffmanFilenameCompress);
+        String oriFilename2 = "G:\\alice29_2.txt";
+        String bwtFilename2 = "G:\\alice29_2.txt.bwt";
+        String rleFilename2 = "G:\\alice29_2.txt.bwt.rle";
 
-        huffmanDecompress(inHuffmanFilenameDecompress, outHuffmanFilenameDecompress);
-        lzwDecompress(inLzwFilenameDecompress, outLzwFilenameDecompress);
+        InputStream in = new FileInputStream(oriFilename);
+        OutputStream out = new FileOutputStream(bwtFilename);
+
+        BurrowsWheeler.encode(in, out);
+
+        in = new FileInputStream(bwtFilename);
+        out = new FileOutputStream(rleFilename);
+
+        RunLength.compress(in, out);
+
+        in = new FileInputStream(rleFilename);
+        out = new FileOutputStream(hufFilename);
+
+        Huffman.compress(in, out);
+
+
+        in = new FileInputStream(hufFilename);
+        out = new FileOutputStream(rleFilename2);
+
+        Huffman.expand(in, out);
+
+        in = new FileInputStream(rleFilename2);
+        out = new FileOutputStream(bwtFilename2);
+
+        RunLength.expand(in, out);
+
+        in = new FileInputStream(bwtFilename2);
+        out = new FileOutputStream(oriFilename2);
+
+        BurrowsWheeler.decode(in, out);
 
         System.out.println("fim");
-    }
-
-    private static void lzwCompress(String inFilename, String outFilename) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
-        LZW.compress(in, out);
-    }
-
-    private static void lzwDecompress(String inFilename, String outFilename) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
-        LZW.expand(in, out);
-    }
-
-    private static void huffmanCompress(String inFilename, String outFilename) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
-        Huffman.compress(in, out);
-    }
-
-    private static void huffmanDecompress(String inFilename, String outFilename) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
-        Huffman.expand(in, out);
-    }
-
-    private static void runLengthCompress(String inFilename, String outFilename) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
-        RunLength.compress(in, out);
-    }
-
-    private static void runLengthDecompress(String inFilename, String outFilename) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(inFilename));
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(outFilename));
-        RunLength.expand(in, out);
     }
 }
